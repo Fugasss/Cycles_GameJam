@@ -36,6 +36,5 @@ public class DayNightVolumeChanger : MonoBehaviour
     private void ChangeVolumeWeight(Volume volume, float value)
     {
         DOTween.To(()=>volume.weight,x=>volume.weight = x, value, _transitionDuration).SetEase(Ease.InCubic);
-
     }
 }
