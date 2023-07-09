@@ -51,8 +51,8 @@ public class Enemy : MonoBehaviour
         if (_cycle.CurrentState == DayNightCycle.State.Day) return;
 
         CalculateRotation();
-
-        bool nearPlayer = Vector2.Distance(transform.position, _player.transform.position) <= _detectionDistance;
+        float distanceToPlayer = Vector2.Distance(transform.position, _player.transform.position);
+        bool nearPlayer = distanceToPlayer <= _detectionDistance;
 
         if (!nearPlayer && !_followPlayer)
         {
@@ -76,8 +76,8 @@ public class Enemy : MonoBehaviour
         }
         
         _followPlayer = true;
-        
         _agent.SetDestination(_player.transform.position);
+        _player.SetDistanceToNearestEnemy(distanceToPlayer);
     }
 
     private void CalculateRotation()
