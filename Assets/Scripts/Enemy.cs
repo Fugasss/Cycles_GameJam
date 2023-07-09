@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private Vector3 _upVector = Vector3.up;
     [SerializeField, Min(0)] private float _detectionDistance = 1f;
     [SerializeField] private bool _patrol;
+    [SerializeField] private bool _ignoreDay = false;
 
     private Player _player;
     private DayNightCycle _cycle;
@@ -23,16 +24,25 @@ public class Enemy : MonoBehaviour
     private float _defaultLightIntensity;
 
     private bool _followPlayer = false;
+    private Vector2 _startPosition;
 
     private void Awake()
     {
-        _player = FindObjectOfType<Player>();
-        _cycle = FindObjectOfType<DayNightCycle>();
+        _player = FindObjectOfType<Player>(true);
+        _cycle = FindObjectOfType<DayNightCycle>(true);
         _renderer = _vfx.GetComponent<SpriteRenderer>();
 
-        _defaultLightIntensity = _light.intensity;
         _cycle.Day += OnDay;
         _cycle.Night += OnNight;
+        
+        var gameStarter = FindObjectOfType<GameStarterWindow>();
+        gameStarter.GameStarted += () =>
+        {
+            transform.position = _startPosition;
+            _followPlayer = false;
+            _agent.velocity = Vector3.zero;
+            _agent.SetDestination(_startPosition);
+        };
     }
 
 
@@ -41,6 +51,9 @@ public class Enemy : MonoBehaviour
         _agent = GetComponent<NavMeshAgent>();
         _agent.updateRotation = false;
         _agent.updateUpAxis = false;
+
+        _defaultLightIntensity = _light.intensity;
+        _startPosition = transform.position;
     }
 
     private const float ChangeDestinationTime = 1.5f;
@@ -48,7 +61,7 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        if (_cycle.CurrentState == DayNightCycle.State.Day) return;
+        if (_cycle.CurrentState == DayNightCycle.State.Day && !_ignoreDay) return;
 
         CalculateRotation();
         float distanceToPlayer = Vector2.Distance(transform.position, _player.transform.position);
@@ -77,7 +90,7 @@ public class Enemy : MonoBehaviour
         
         _followPlayer = true;
         _agent.SetDestination(_player.transform.position);
-        _player.SetDistanceToNearestEnemy(distanceToPlayer);
+        _player.SetDistanceToNearestEnemy(distanceToPlayer, _detectionDistance);
     }
 
     private void CalculateRotation()

@@ -1,4 +1,3 @@
-using System;
 using Cinemachine;
 using DG.Tweening;
 using UnityEngine;
@@ -18,32 +17,50 @@ public class Player : MonoBehaviour
 
     [SerializeField] private float _minPitch;
     [SerializeField] private float _maxPitch;
-
-
+    
     private Vector2 _input;
-    private Vector2 _velocity;
     private Vector2 _toMouseDirection;
     private float _startCameraSize;
-
+    private Vector2 _startPosition;
+    
     private Rigidbody2D _rigidbody;
     private SpriteRenderer _renderer;
     private Ventil _ventil;
     private GameOverWindow _gameOverWindow;
+    private GameEndWindow _gameEndWindow ;
+
     private DayNightCycle _cycle;
 
+    private bool _gameOver = false;
+    
     private void Awake()
     {
-        _cycle = FindObjectOfType<DayNightCycle>();
-        _gameOverWindow = FindObjectOfType<GameOverWindow>();
+        _cycle = FindObjectOfType<DayNightCycle>(true);
+        _gameOverWindow = FindObjectOfType<GameOverWindow>(true);
+        _gameEndWindow = FindObjectOfType<GameEndWindow>(true);
         _rigidbody = GetComponent<Rigidbody2D>();
         _renderer = _vfx.GetComponent<SpriteRenderer>();
         _ventil = GetComponentInChildren<Ventil>();
 
         _cycle.Day += OnDay;
+
+        _gameOver = true;
+        
+        var gameStarter = FindObjectOfType<GameStarterWindow>();
+        gameStarter.GameStarted += () =>
+        {
+            transform.position = _startPosition;
+            _camera.m_Lens.OrthographicSize = _startCameraSize;
+            _input = Vector2.zero;
+            _toMouseDirection = Vector2.right;
+            _gameOver = false;
+            Detectable = true;
+        };
     }
 
     private void Start()
     {
+        _startPosition = transform.position;
         _startCameraSize = _camera.m_Lens.OrthographicSize;
     }
 
@@ -59,6 +76,8 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        if(_gameOver) return; 
+        
         _input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         _input.Normalize();
 
@@ -88,37 +107,47 @@ public class Player : MonoBehaviour
         _renderer.flipX = flip;
         _vfx.rotation = Quaternion.Euler(0, 0, (flip ? angle + 180 : angle));
     }
-
-    private const float SoundBeginDistance = 3f;
+    
     private float _lastDistance = 1000f;
 
-    public void SetDistanceToNearestEnemy(float distance)
+    public void SetDistanceToNearestEnemy(float distance, float detectionDistance)
     {
         if (!Detectable) return;
-
+        
+        if (_cycle.CurrentState == DayNightCycle.State.Night)
+        {
+            if (!_enemyNearnessSource.isPlaying)
+            {
+                _enemyNearnessSource.volume = 0f;
+                _enemyNearnessSource.Play();
+            }
+        }
+        
         if (distance < _lastDistance)
             _lastDistance = distance;
-
-        if (_lastDistance <= SoundBeginDistance)
+        
+        if (_lastDistance <= detectionDistance)
         {
-            float volume = (SoundBeginDistance - _lastDistance) / SoundBeginDistance;
+            float volume = (detectionDistance - _lastDistance) / detectionDistance;
 
             _enemyNearnessSource.volume = Mathf.MoveTowards(_enemyNearnessSource.volume, volume, 3f * Time.deltaTime);
             _camera.m_Lens.OrthographicSize = Mathf.MoveTowards(_camera.m_Lens.OrthographicSize,
                                                                 _startCameraSize * (1 - .7f * volume),
                                                                 1f * Time.deltaTime);
         }
-
-        if (_cycle.CurrentState == DayNightCycle.State.Day) return;
-        if (_enemyNearnessSource.isPlaying) return;
-
-        _enemyNearnessSource.volume = 0f;
-        _enemyNearnessSource.Play();
     }
 
-    public void GameOver()
+    public void GameOver(bool win = false)
     {
-        Debug.Log("Game Over");
-        _gameOverWindow.Show();
+        _gameOver = true;
+        Detectable = false;
+        
+        _enemyNearnessSource.Stop();
+        _movementSoundSource.Stop();
+
+        if (win)
+            _gameEndWindow.Show();
+        else
+            _gameOverWindow.Show();
     }
 }

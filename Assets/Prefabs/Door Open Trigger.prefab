@@ -242,9 +242,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6afbc5468764ff68cf5cf9159029d6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _door: {fileID: 0}
+  _doors: []
   _openDoor: 1
   _buttonVfx: {fileID: 2284641375047872964}
+  _pushSound: {fileID: 8300000, guid: 06eb8d8c751b35540a7f51a78a30e92c, type: 3}
   _pressedPosition: {x: 0, y: -0.15, z: 0}
 --- !u!1 &2284641375576499157
 GameObject:

@@ -24,16 +24,22 @@ public class Door : MonoBehaviour
         var material = Instantiate( renderer.material);
         material.SetVector("_TimeOffset", new Vector4(Random.Range(-50f,50f), Random.Range(-50f,50f), 0,0));
         renderer.material = material;
+        
+        var gameStarter = FindObjectOfType<GameStarterWindow>();
+        gameStarter.GameStarted += () =>
+        {
+            CurrentOpenState = !_startOpenState;
+            
+            if (_startOpenState)
+                Open();
+            else
+                Close();
+        };
     }
 
     private void Start()
     {
         _startWorldPosition = transform.position;
-
-        if (_startOpenState)
-            Open();
-        else
-            Close();
     }
 
     [ContextMenu("Open")]

@@ -10,10 +10,22 @@ public class ButtonDoorOpener : DoorOpener
     [SerializeField] private Vector3 _pressedPosition;
 
     private AudioSource _source;
-    
+    private Vector3 _startVfxPosition;
+        
     private void Awake()
     {
         _source = FindObjectOfType<AudioSource>();
+
+        var starter = FindObjectOfType<GameStarterWindow>();
+        starter.GameStarted += () =>
+        {
+            _buttonVfx.DOLocalMove(_startVfxPosition, 0.5f);
+        };
+    }
+
+    private void Start()
+    {
+        _startVfxPosition = _buttonVfx.localPosition;
     }
 
     protected override bool MatchRule(Collider2D col)

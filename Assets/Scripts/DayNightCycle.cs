@@ -16,26 +16,41 @@ public class DayNightCycle : MonoBehaviour
 
     private void Start()
     {
-        StartCycle();
+        SetNight();
     }
 
     public void StartCycle()
     {
-        if (_cycleRoutine != null)
-            StopCoroutine(_cycleRoutine);
+        StopCycle();
 
         _cycleRoutine = StartCoroutine(Cycle());
     }
 
+    public void StopCycle()
+    {
+        if (_cycleRoutine != null)
+            StopCoroutine(_cycleRoutine);
+    }
+
+    public void SetDay()
+    {
+        Day?.Invoke();
+        CurrentState = State.Day;
+    }
+
+    public void SetNight()
+    {
+        Night?.Invoke();
+        CurrentState = State.Night;
+    }
+    
     private IEnumerator Cycle()
     {
         while (true)
         {
-            Day?.Invoke();
-            CurrentState = State.Day;
+            SetDay();
             yield return new WaitForSeconds(_dayTime);
-            Night?.Invoke();
-            CurrentState = State.Night;
+            SetNight();
             yield return new WaitForSeconds(_nightTime);
         }
     }

@@ -1,19 +1,19 @@
+using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameStarterWindow : MonoBehaviour, IWindow
 {
+    public event Action GameStarted;
+    
     [SerializeField] private DayNightCycle _cycle;
     
     public void StartGame()
     {
-        gameObject.SetActive(false);
-        _cycle.StartCycle();
-    }
+        Time.timeScale = 1f;
 
-    public void RestartGame()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        gameObject.SetActive(false);
+        GameStarted?.Invoke();
+        _cycle.StartCycle();
     }
 
     public void Show()

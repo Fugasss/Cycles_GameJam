@@ -3,6 +3,15 @@ using UnityEngine;
 
 public class GameOverWindow : MonoBehaviour, IWindow
 {
+    private void Awake()
+    {
+        var gameStarter = FindObjectOfType<GameStarterWindow>(true);
+        gameStarter.GameStarted += () =>
+        {
+            gameObject.SetActive(false);
+        };
+    }
+
     private void Start()
     {
         gameObject.SetActive(false);

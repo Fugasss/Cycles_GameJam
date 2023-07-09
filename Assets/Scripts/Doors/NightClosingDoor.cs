@@ -8,7 +8,7 @@ public class NightClosingDoor : Door
     {
         base.Awake();
         
-        var cycle = FindObjectOfType<DayNightCycle>();
+        var cycle = FindObjectOfType<DayNightCycle>(true);
 
         if (_openDuringNight)
         {

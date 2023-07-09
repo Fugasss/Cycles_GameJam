@@ -3,7 +3,6 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class HidePlace : MonoBehaviour
 {
-    
     private void Awake()
     {
         var renderers = GetComponentsInChildren<Renderer>();
@@ -21,7 +20,7 @@ public class HidePlace : MonoBehaviour
         col.isTrigger = true;
     }
 
-    private void OnTriggerEnter2D(Collider2D col)
+    private void OnTriggerStay2D(Collider2D col)
     {
         if(!col.TryGetComponent<Player>(out var player)) return;
         player.Detectable = false;
