@@ -11,16 +11,13 @@ public class ButtonDoorOpener : DoorOpener
 
     private AudioSource _source;
     private Vector3 _startVfxPosition;
-        
+
     private void Awake()
     {
         _source = FindObjectOfType<AudioSource>();
 
         var starter = FindObjectOfType<GameStarterWindow>();
-        starter.GameStarted += () =>
-        {
-            _buttonVfx.DOLocalMove(_startVfxPosition, 0.5f);
-        };
+        starter.GameStarted += () => { _buttonVfx.DOLocalMove(_startVfxPosition, 0.5f); };
     }
 
     private void Start()
@@ -39,12 +36,13 @@ public class ButtonDoorOpener : DoorOpener
 
         _buttonVfx.DOLocalMove(_pressedPosition, 0.5f);
         _source.PlayOneShot(_pushSound);
-
     }
+#if UNITY_EDITOR
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(_buttonVfx.position + _buttonVfx.rotation * _pressedPosition , 0.15f);
+        Gizmos.DrawWireSphere(_buttonVfx.position + _buttonVfx.rotation * _pressedPosition, 0.15f);
     }
+#endif
 }

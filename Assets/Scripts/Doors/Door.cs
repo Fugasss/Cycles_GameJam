@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 public class Door : MonoBehaviour
 {
     [SerializeField] private Transform _vfx;
-    [SerializeField, Min(0)] private float _closeTime = 1f;
+    [SerializeField, Min(0f)] private float _closeTime = 1f;
     [SerializeField] private bool _startOpenState = false;
     [SerializeField] private Vector3 _openedPosition;
     [SerializeField] private Vector3 _closedPosition;
@@ -75,7 +75,7 @@ public class Door : MonoBehaviour
 
         CurrentOpenState = false;
     }
-    
+    #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         if (!EditorApplication.isPlaying)
@@ -89,4 +89,5 @@ public class Door : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere( _startWorldPosition + transform.rotation *_closedPosition, 0.5f);
     }
+    #endif
 }

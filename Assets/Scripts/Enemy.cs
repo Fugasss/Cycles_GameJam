@@ -34,7 +34,7 @@ public class Enemy : MonoBehaviour
 
         _cycle.Day += OnDay;
         _cycle.Night += OnNight;
-        
+
         var gameStarter = FindObjectOfType<GameStarterWindow>();
         gameStarter.GameStarted += () =>
         {
@@ -87,7 +87,7 @@ public class Enemy : MonoBehaviour
             _followPlayer = false;
             return;
         }
-        
+
         _followPlayer = true;
         _agent.SetDestination(_player.transform.position);
         _player.SetDistanceToNearestEnemy(distanceToPlayer, _detectionDistance);
@@ -107,7 +107,7 @@ public class Enemy : MonoBehaviour
     private void OnDay()
     {
         _followPlayer = false;
-        
+
         DOTween
             .To(() => _light.intensity, x => _light.intensity = x, 0f, 1.5f)
             .SetEase(Ease.OutCubic)
@@ -125,16 +125,18 @@ public class Enemy : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D col)
     {
-        if(_cycle.CurrentState == DayNightCycle.State.Day) return;
-        if(!col.collider.TryGetComponent<Player>(out var player)) return;
-        if(!player.Detectable) return;
+        if (_cycle.CurrentState == DayNightCycle.State.Day) return;
+        if (!col.collider.TryGetComponent<Player>(out var player)) return;
+        if (!player.Detectable) return;
 
         player.GameOver();
     }
-
+    
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, _detectionDistance);
     }
+#endif
 }
